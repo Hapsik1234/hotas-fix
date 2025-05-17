@@ -30,7 +30,6 @@ try:
         def do_GET(self):
             # Send response headers
             self.send_response(200)
-            self.send_header('Content-type', 'text/html')
             self.end_headers()
 
             p = ""
@@ -48,6 +47,8 @@ try:
                     command=value
                 print(f"{header}: {value}")
             
+
+
             if p and v:
                 print("h: ",p)
                 print("v: ",v)
@@ -57,15 +58,13 @@ try:
             if command:
                 nasal(tn, command)
 
-
-
                 
 
             # Response body
             self.wfile.write(b"Hello, World!")
 
     host = 'localhost'
-    port = 80
+    port = 6500
 
     server = HTTPServer((host, port), SimpleHTTPRequestHandler)
 

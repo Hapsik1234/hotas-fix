@@ -1,5 +1,5 @@
 ('D:\\desktop -  heavy\\dwd\\projekty\\programowanie\\hotas '
- 'fix\\build\\main\\main.pkg',
+ 'fix\\python+js\\build\\main\\main.pkg',
  {'BINARY': True,
   'DATA': True,
   'EXECUTABLE': True,
@@ -10,27 +10,27 @@
   'SPLASH': True},
  [('PYZ-00.pyz',
    'D:\\desktop -  heavy\\dwd\\projekty\\programowanie\\hotas '
-   'fix\\build\\main\\PYZ-00.pyz',
+   'fix\\python+js\\build\\main\\PYZ-00.pyz',
    'PYZ'),
   ('struct',
    'D:\\desktop -  heavy\\dwd\\projekty\\programowanie\\hotas '
-   'fix\\build\\main\\localpycs\\struct.pyc',
+   'fix\\python+js\\build\\main\\localpycs\\struct.pyc',
    'PYMODULE'),
   ('pyimod01_archive',
    'D:\\desktop -  heavy\\dwd\\projekty\\programowanie\\hotas '
-   'fix\\build\\main\\localpycs\\pyimod01_archive.pyc',
+   'fix\\python+js\\build\\main\\localpycs\\pyimod01_archive.pyc',
    'PYMODULE'),
   ('pyimod02_importers',
    'D:\\desktop -  heavy\\dwd\\projekty\\programowanie\\hotas '
-   'fix\\build\\main\\localpycs\\pyimod02_importers.pyc',
+   'fix\\python+js\\build\\main\\localpycs\\pyimod02_importers.pyc',
    'PYMODULE'),
   ('pyimod03_ctypes',
    'D:\\desktop -  heavy\\dwd\\projekty\\programowanie\\hotas '
-   'fix\\build\\main\\localpycs\\pyimod03_ctypes.pyc',
+   'fix\\python+js\\build\\main\\localpycs\\pyimod03_ctypes.pyc',
    'PYMODULE'),
   ('pyimod04_pywin32',
    'D:\\desktop -  heavy\\dwd\\projekty\\programowanie\\hotas '
-   'fix\\build\\main\\localpycs\\pyimod04_pywin32.pyc',
+   'fix\\python+js\\build\\main\\localpycs\\pyimod04_pywin32.pyc',
    'PYMODULE'),
   ('pyiboot01_bootstrap',
    'C:\\Users\\zzz\\AppData\\Local\\Programs\\Python\\Python310-32\\lib\\site-packages\\PyInstaller\\loader\\pyiboot01_bootstrap.py',
@@ -39,7 +39,8 @@
    'C:\\Users\\zzz\\AppData\\Local\\Programs\\Python\\Python310-32\\Lib\\site-packages\\PyInstaller\\hooks\\rthooks\\pyi_rth_inspect.py',
    'PYSOURCE'),
   ('main',
-   'D:\\desktop -  heavy\\dwd\\projekty\\programowanie\\hotas fix\\main.py',
+   'D:\\desktop -  heavy\\dwd\\projekty\\programowanie\\hotas '
+   'fix\\python+js\\main.py',
    'PYSOURCE'),
   ('VCRUNTIME140.dll',
    'C:\\Users\\zzz\\AppData\\Local\\Programs\\Python\\Python310-32\\VCRUNTIME140.dll',
@@ -79,7 +80,7 @@
    'BINARY'),
   ('base_library.zip',
    'D:\\desktop -  heavy\\dwd\\projekty\\programowanie\\hotas '
-   'fix\\build\\main\\base_library.zip',
+   'fix\\python+js\\build\\main\\base_library.zip',
    'DATA')],
  False,
  False,

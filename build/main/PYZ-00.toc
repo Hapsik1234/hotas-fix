@@ -1,5 +1,5 @@
 ('D:\\desktop -  heavy\\dwd\\projekty\\programowanie\\hotas '
- 'fix\\build\\main\\PYZ-00.pyz',
+ 'fix\\python+js\\build\\main\\PYZ-00.pyz',
  [('_compat_pickle',
    'C:\\Users\\zzz\\AppData\\Local\\Programs\\Python\\Python310-32\\lib\\_compat_pickle.py',
    'PYMODULE'),

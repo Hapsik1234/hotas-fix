@@ -75,11 +75,12 @@ class HID {
 }
 
 
-
+// Updating props (sending to server)
 function send(path, value) {
-  const url = 'http://127.0.0.1:80';
 
-  // Specify your custom header
+
+  const url = 'http://127.0.0.1:6500';
+
   const options = {
     url: url,
     headers: {
@@ -98,7 +99,11 @@ function send(path, value) {
   });
 }
 
+
+// Updating props via nasal
 function nasal(command) {
+
+
   const url = 'http://127.0.0.1:80';
 
   // Specify your custom header
@@ -123,10 +128,6 @@ function dec2bin(dec) {
   return (dec >>> 0).toString(2);
 }
 
-
-
-throttle = new HID(0x0738, 0xA221);
-
 const state = {
   busy: "busy",
   idle: "idle"
@@ -136,19 +137,31 @@ const state = {
 var controls = {
   rthrottle: 0.0,
   lthrottle: 0.0,
+  aileron: 0.0,
+  elevator: 0.0,
   flaps: state.idle,
   gear: state.idle
 }
 
+const ActivelyUpdatedPropsTreashold = 3;
+
+var lastcontrols = { ...controls };
+
+var currentprop = 0;
+
+console.log("Updating")
 
 
+
+// Defining throttle as new HID device
+
+throttle = new HID(0x0738, 0xA221);
 
 throttle.bus.on("readabledata", (data) => {
-  console.log(data);
+  // console.log(data);
 });
 
 throttle.bus.on("bindata", (data) => {
-
 
   // Left throttle
 
@@ -162,11 +175,11 @@ throttle.bus.on("bindata", (data) => {
   controls.lthrottle = buffer;
 
 
+
   // Flaps
 
 
-
-  if (data[3][3]=='1') {
+  if (data[3][3]=='1') {  // Flaps down
     // console.log("Clicked to up, state now " + controls.flaps)
     if(controls.flaps==state.idle) {
       nasal("controls.flapsDown(1)");
@@ -174,7 +187,6 @@ throttle.bus.on("bindata", (data) => {
       // console.log("Sent for up, state now " + controls.flaps)
     }
   }
-
   if (data[3][3]=='0') {
     // console.log("Setting for busy (up), state now " + controls.flaps)
     if(controls.flaps==state.busy) {
@@ -185,7 +197,7 @@ throttle.bus.on("bindata", (data) => {
 
 
 
-  if(data[3][4]=='1') {
+  if(data[3][4]=='1') {   // Flaps up
     // console.log("Clicked to down, state now " + controls.flaps)
     if(controls.flaps==state.idle) {
       nasal("controls.flapsDown(-1)");
@@ -193,7 +205,6 @@ throttle.bus.on("bindata", (data) => {
       // console.log("Sent for down, state now " + controls.flaps)
     }
   }
-
   if(data[3][4]=='0') {
     // console.log("Setting for busy (down), state now " + controls.flaps)
     if(controls.flaps==state.busy) {
@@ -208,13 +219,12 @@ throttle.bus.on("bindata", (data) => {
   // Gear
 
 
-  if (data[3][5]=='1') {
+  if (data[3][5]=='1') {  // Gear down
     if(controls.gear==state.idle) {
       send('/controls/gear/gear-down', "true")
       controls.gear==state.busy;
     }
   }
-
   if (data[3][5]=='0') {
     if(controls.gear==state.busy) {
       controls.gear==state.idle;
@@ -222,13 +232,12 @@ throttle.bus.on("bindata", (data) => {
   }
 
 
-  if(data[3][6]=='1') {
+  if(data[3][6]=='1') { // Gear up
     if(controls.gear==state.idle) {
       send('/controls/gear/gear-down', "false")
       controls.gear==state.busy;
     }
   }
-
   if(data[3][6]=='0') {
     if(controls.gear==state.busy) {
       controls.gear==state.idle;
@@ -237,11 +246,114 @@ throttle.bus.on("bindata", (data) => {
 
 });
 
+
+stick = new HID(0x0738, 0x2221);
+
+stick.bus.on("readabledata", (data) => {
+  // console.log(data);
+});
+
+stick.bus.on("bindata", (data) => {
+
+
+  range = 65535.0;
+
+
+  // Aileron (roll axis)
+
+  aileron = data[1] + data[0];
+  aileron = parseInt(aileron, 2);
+
+  // Converting from range (0 - 65535) to (-1.0 - 1.0)
+  aileron = (range / 2.0) - aileron;
+  aileron = aileron / (range / 2.0);
+
+  aileron = -aileron; // Inverting value
+
+  controls.aileron = aileron;
+
+
+
+  // Elevator (pitch axis)
+
+  elevator = data[3] + data[2];
+  elevator = parseInt(elevator, 2);
+
+  // Converting the value similarly without invertion
+  elevator = (range / 2.0) - elevator
+  elevator = elevator / (range / 2.0);
+
+  controls.elevator = elevator;
+
+  // console.log("aileron: ", aileron, ", elevator: ", elevator);
+
+});
+
+
+
+// Actively updating throttle values with stable timeout
+// TODO: Change way of updating
+
+function updateThing(thing) {
+  switch (thing) {
+
+    case "lthrottle":
+      send('/controls/engines/engine[0]/throttle', controls.lthrottle);
+      send('/controls/engines/engine[1]/throttle', controls.lthrottle);
+    break;
+    case "aileron":
+      send('/controls/flight/aileron', controls.aileron);
+    break;
+    case "elevator":
+      send('/controls/flight/elevator', controls.elevator);
+    break;
+
+
+  }
+}
+
+
+function updateThings() {
+
+  property = Object.keys(controls)[currentprop];
+  
+  try {
+    console.log(`${property}: ${controls[property]} vs ${lastcontrols[property]}`);
+    if (controls[property] != lastcontrols[property]) {
+      console.log(property, "has been updated.")
+      updateThing(property)
+    }
+    lastcontrols[property] = controls[property];
+  } catch (error) {
+    console.error(`Error encoutered when updating props: ${error}`)
+  }
+  
+
+  
+
+  if (currentprop>=ActivelyUpdatedPropsTreashold) {
+    currentprop = 0;
+  } else {
+    currentprop++;
+  }
+
+
+}
+
+
 setInterval(() => {
-  // console.log(controls.lthrottle);
-  send('/controls/engines/engine[0]/throttle', controls.lthrottle)
-  setTimeout(100,send('/controls/engines/engine[1]/throttle', controls.lthrottle));
-}, 200);
+  // send('/controls/engines/engine[0]/throttle', controls.lthrottle)
+  // setTimeout(50,send('/controls/engines/engine[1]/throttle', controls.lthrottle)); // Timeout to not overload server with data
+  // setTimeout(100,send('/controls/flight/elevator', controls.elevator)); // Timeout to not overload server with data
+  // setTimeout(150,send('/controls/flight/aileron', controls.aileron)); // Timeout to not overload server with data
+
+  updateThings();
+
+}, 50);
+
+
+
+
 
 
 // // Find your throttle
